@@ -7,9 +7,11 @@ import os
 chrome_options = Options()
 chrome_options.add_argument('--headless')
 
+# Byt arbetsmapp till platsen där Git-repositoryt finns
+os.chdir('/home/pi/livechart/')
+
 # Skapa en instans av webdrivrern (i detta fall Chrome)
 driver = webdriver.Chrome(options=chrome_options)
-
 
 # Öppna sidan du vill ladda ner html-koden för
 driver.get('https://www.livechart.me/timetable')
@@ -20,7 +22,7 @@ try:
     popup_yes_button = driver.find_element_by_xpath('//button[contains(@class,"expanded") and contains(text(),"Yes")]')
     time.sleep(5) # Vänta i 5 sekunder efter att popup-fönstret har laddats in
     popup_yes_button.click()
-    
+
     print("Button clicked")
     driver.implicitly_wait(10) # Vänta i 10 sekunder på att sidan laddas
 except:
