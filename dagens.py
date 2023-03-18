@@ -2,10 +2,10 @@ from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 
 import time
+import os
 
 chrome_options = Options()
 chrome_options.add_argument('--headless')
-chrome_options.binary_location = '/usr/bin/chromium-browser'
 
 # Skapa en instans av webdrivrern (i detta fall Chrome)
 driver = webdriver.Chrome(options=chrome_options)
@@ -29,9 +29,14 @@ except:
 # Vänta i 5 sekunder innan du hämtar html-koden och sparar den till en fil
 time.sleep(5)
 html = driver.page_source
-with open('/mnt/pi/livechart/livechart.html', 'w', encoding='utf-8') as f:
+with open('livechart.html', 'w', encoding='utf-8') as f:
     f.write(html)
 print("HTML saved")
 
 # Stäng webbläsaren
 driver.quit()
+
+# Pusha ändringarna till din Git-repo på GitHub
+os.system('git add .')
+os.system('git commit -m "Uppdaterar livechart.html"')
+os.system('git push -u origin master')
