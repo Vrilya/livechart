@@ -6735,3 +6735,54 @@ Button clicked
 HTML saved
 /home/pi/livechart/dagens.py:22: DeprecationWarning: find_element_by_* commands are deprecated. Please use find_element() instead
   popup_yes_button = driver.find_element_by_xpath('//button[contains(@class,"expanded") and contains(text(),"Yes")]')
+[master 97032a0] Uppdaterar livechart.html
+ 2 files changed, 14 insertions(+), 3 deletions(-)
+remote: This repository moved. Please use the new location:        
+remote:   git@github.com:Vrilya/livechart.git        
+To github.com:vrilya/livechart.git
+   8cb7e77..97032a0  master -> master
+Branch 'master' set up to track remote branch 'master' from 'origin'.
+Button clicked
+HTML saved
+Traceback (most recent call last):
+  File "/home/pi/livechart/dagens.py", line 14, in <module>
+    driver = webdriver.Chrome(options=chrome_options)
+  File "/home/pi/.local/lib/python3.9/site-packages/selenium/webdriver/chrome/webdriver.py", line 70, in __init__
+    super(WebDriver, self).__init__(DesiredCapabilities.CHROME['browserName'], "goog",
+  File "/home/pi/.local/lib/python3.9/site-packages/selenium/webdriver/chromium/webdriver.py", line 93, in __init__
+    RemoteWebDriver.__init__(
+  File "/home/pi/.local/lib/python3.9/site-packages/selenium/webdriver/remote/webdriver.py", line 268, in __init__
+    self.start_session(capabilities, browser_profile)
+  File "/home/pi/.local/lib/python3.9/site-packages/selenium/webdriver/remote/webdriver.py", line 359, in start_session
+    response = self.execute(Command.NEW_SESSION, parameters)
+  File "/home/pi/.local/lib/python3.9/site-packages/selenium/webdriver/remote/webdriver.py", line 424, in execute
+    self.error_handler.check_response(response)
+  File "/home/pi/.local/lib/python3.9/site-packages/selenium/webdriver/remote/errorhandler.py", line 247, in check_response
+    raise exception_class(message, screen, stacktrace)
+selenium.common.exceptions.WebDriverException: Message: unknown error: Chrome failed to start: crashed.
+  (chrome not reachable)
+  (The process started from chrome location /usr/bin/chromium-browser is no longer running, so ChromeDriver is assuming that Chrome has crashed.)
+Stacktrace:
+#0 0x000000a58e58 <unknown>
+#1 0x0000007ff264 <unknown>
+#2 0x00000082afa8 <unknown>
+#3 0x000000827230 <unknown>
+#4 0x00000086e090 <unknown>
+#5 0x000000865018 <unknown>
+#6 0x000000832380 <unknown>
+#7 0x000000833668 <unknown>
+#8 0x000000aa7818 <unknown>
+#9 0x000000aaa6e8 <unknown>
+#10 0x000000aa9f8c <unknown>
+#11 0x000000aaaea8 <unknown>
+#12 0x000000a908e8 <unknown>
+#13 0x000000aab320 <unknown>
+#14 0x000000a82a50 <unknown>
+#15 0x000000acb2f8 <unknown>
+#16 0x000000acb47c <unknown>
+#17 0x000000ae72f8 <unknown>
+#18 0x000076e9e310 start_thread
+#19 0x000000000000 <unknown>
+
+/home/pi/livechart/dagens.py:22: DeprecationWarning: find_element_by_* commands are deprecated. Please use find_element() instead
+  popup_yes_button = driver.find_element_by_xpath('//button[contains(@class,"expanded") and contains(text(),"Yes")]')
