@@ -9372,3 +9372,16 @@ Button clicked
 HTML saved
 /home/pi/livechart/dagens.py:22: DeprecationWarning: find_element_by_* commands are deprecated. Please use find_element() instead
   popup_yes_button = driver.find_element_by_xpath('//button[contains(@class,"expanded") and contains(text(),"Yes")]')
+[master 054c901] Uppdaterar livechart.html
+ 2 files changed, 48 insertions(+), 36 deletions(-)
+ rewrite livechart.html (61%)
+remote: Resolving deltas:   0% (0/2)        remote: Resolving deltas:  50% (1/2)        remote: Resolving deltas: 100% (2/2)        remote: Resolving deltas: 100% (2/2), completed with 2 local objects.        
+remote: This repository moved. Please use the new location:        
+remote:   git@github.com:Vrilya/livechart.git        
+To github.com:vrilya/livechart.git
+   e5c0bf3..054c901  master -> master
+Branch 'master' set up to track remote branch 'master' from 'origin'.
+Button clicked
+HTML saved
+/home/pi/livechart/dagens.py:22: DeprecationWarning: find_element_by_* commands are deprecated. Please use find_element() instead
+  popup_yes_button = driver.find_element_by_xpath('//button[contains(@class,"expanded") and contains(text(),"Yes")]')
