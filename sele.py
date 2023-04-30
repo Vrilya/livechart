@@ -1,14 +1,23 @@
 from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
 
+import time
+import os
 
-# Ange sökvägen till chromedriver
-#chromedriver_path = "/path/to/chromedriver"
+chrome_options = Options()
+chrome_options.add_argument('--headless')
 
-# Skapa en instans av Chrome webbläsaren med Chromedriver
-driver = webdriver.Chrome()
+# Byt arbetsmapp till platsen där Git-repositoryt finns
+os.chdir('/home/pi/nasdaq/')
+
+# Skapa en instans av webdrivrern (i detta fall Chrome)
+driver = webdriver.Chrome(options=chrome_options)
 
 # Gå till den länkade webbsidan
 driver.get("https://www.nasdaqomxnordic.com/shares/listed-companies/stockholm")
+
+time.sleep(5)
+
 
 # Spara ner sidan på hårddisken
 with open("stockholm.html", "w") as f:
