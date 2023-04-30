@@ -1,0 +1,6 @@
+geckodriver: /lib/arm-linux-gnueabihf/libc.so.6: version `GLIBC_2.32' not found (required by geckodriver)
+geckodriver: /lib/arm-linux-gnueabihf/libc.so.6: version `GLIBC_2.33' not found (required by geckodriver)
+geckodriver: /lib/arm-linux-gnueabihf/libc.so.6: version `GLIBC_2.34' not found (required by geckodriver)
+geckodriver: /lib/arm-linux-gnueabihf/libc.so.6: version `GLIBC_2.32' not found (required by geckodriver)
+geckodriver: /lib/arm-linux-gnueabihf/libc.so.6: version `GLIBC_2.33' not found (required by geckodriver)
+geckodriver: /lib/arm-linux-gnueabihf/libc.so.6: version `GLIBC_2.34' not found (required by geckodriver)
