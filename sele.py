@@ -5,10 +5,10 @@ import time
 import os
 
 chrome_options = Options()
-chrome_options.add_argument('--headless')
+#chrome_options.add_argument('--headless')
 
 # Byt arbetsmapp till platsen där Git-repositoryt finns
-os.chdir('/home/pi/nasdaq/')
+os.chdir('/home/pi/livechart/')
 
 # Skapa en instans av webdrivrern (i detta fall Chrome)
 driver = webdriver.Chrome(options=chrome_options)
@@ -16,7 +16,7 @@ driver = webdriver.Chrome(options=chrome_options)
 # Gå till den länkade webbsidan
 driver.get("https://www.nasdaqomxnordic.com/shares/listed-companies/stockholm")
 
-time.sleep(5)
+time.sleep(15)
 
 
 # Spara ner sidan på hårddisken
