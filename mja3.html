@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Bibelns Väljare</title>
+    <style>
+        select, button {
+            width: 200px;
+            margin-bottom: 10px;
+        }
+        .dark-mode {
+            background-color: #2c2c2c;
+            color: white;
+        }
+        .dark-mode .popup-content {
+            background-color: #3c3c2c;
+            color: white;
+        }
+        #textContainer {
+            max-width: 800px;
+            margin: auto;
+            text-align: justify;
+            padding: 10px;
+            border: 1px solid black;
+        }
+        .popup-container {
+            display: none;
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            background-color: rgba(0,0,0,0.8);
+            z-index: 1000;
+        }
+        .popup-content {
+            background-color: white;
+            width: 50%;
+            max-width: 1000px;
+            margin: 20px auto;
+            padding: 20px;
+            overflow: auto;
+            height: 90%;
+        }
+    </style>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+</head>
+<body>
+    <button id="darkModeToggle">Dark Mode</button>
+    <br>
+    Font Size: 
+    <select id="fontSizeSelect">
+        <option value="12px">12</option>
+        <option value="14px">14</option>
+        <option value="16px">16</option>
+        <option value="18px">18</option>
+        <option value="20px">20</option>
+    </select>
+    <br>
+    Font Family: 
+	<select id="fontFamilySelect">
+		<option value="Arial">Arial</option>
+		<option value="Courier New">Courier New</option>
+		<option value="Georgia">Georgia</option>
+		<option value="Times New Roman">Times New Roman</option>
+		<option value="Verdana">Verdana</option>
+		<option value="Helvetica">Helvetica</option>
+		<option value="Tahoma">Tahoma</option>
+		<option value="Impact">Impact</option>
+		<option value="Lucida Sans Unicode">Lucida Sans Unicode</option>
+		<option value="Trebuchet MS">Trebuchet MS</option>
+		<option value="Century Gothic">Century Gothic</option>
+		<option value="Consolas">Consolas</option>
+		<option value="Calibri">Calibri</option>
+		<option value="Source Sans Pro">Source Sans Pro</option>
+		<option value="Merriweather">Merriweather</option>
+		<option value="Noto Sans">Noto Sans</option>
+		<option value="Poppins">Poppins</option>
+	</select>
+
+    <br>
+    <select id="bibleSelect">
+        <option value="https://vrilya.github.io/livechart/bibel_2000.json">Bibel 2000</option>
+		<option value="https://vrilya.github.io/livechart/bibel_1917.json">Bibel 1917</option>
+        <option value="https://vrilya.github.io/livechart/bible_xii.json">Bibel XII</option>
+        <option value="https://vrilya.github.io/livechart/bibeln_folk.json">Folkbibeln (2017)</option>
+        <option value="https://vrilya.github.io/livechart/bibel_jw_ny.json">Jehovas Bibel (2017)</option>
+		<option value="https://vrilya.github.io/livechart/bibel_jw_2003.json">Jehovas Bibel (2003)</option>
+        <option value="https://vrilya.github.io/livechart/bibeln_kjv.json">Bibel KJV (Patrik Firat)</option>
+		<option value="https://vrilya.github.io/livechart/bibel_reform.json">Reformationsbibeln</option>
+        <option value="https://vrilya.github.io/livechart/bibel_nu2.json">Nubibeln</option>
+		<option value="https://vrilya.github.io/livechart/bibel_skb.json">Svenska Kärnbibeln</option>
+		<option value="https://vrilya.github.io/livechart/bibel_sb.json">Svenskbibel</option>
+    </select>
+    <div id="textContainer">
+        <select id="testamentSelect"></select>
+        <select id="bookSelect"></select>
+        <select id="chapterSelect"></select>
+        <div id="chapterText"></div>
+    </div>
+    <div id="versePopup" class="popup-container">
+        <div class="popup-content">
+            <h2 id="popupTitle" style="text-align:center;"></h2> <!-- Add title in the popup content -->
+        </div>
+    </div>
+    <script>
+        let currentData = null;
+
+        const loadBible = (url) => {
+            $.getJSON(url, function(data) {
+                currentData = data;
+                loadTestaments();
+            });
+        }
+
+        const loadTestaments = () => {
+            $("#testamentSelect").empty();
+            for (let testament in currentData["Bibeln"]) {
+                $("#testamentSelect").append(`<option value="${testament}">${testament}</option>`);
+            }
+            loadBooks();
+        }
+
+        const loadBooks = () => {
+            $("#bookSelect").empty();
+            let testament = $("#testamentSelect").val();
+            for (let bookObj of currentData["Bibeln"][testament]) {
+                for (let book in bookObj) {
+                    $("#bookSelect").append(`<option value="${book}">${book}</option>`);
+                }
+            }
+            loadChapters();
+        }
+
+        const loadChapters = () => {
+            $("#chapterSelect").empty();
+            let testament = $("#testamentSelect").val();
+            let book = $("#bookSelect").val();
+            for (let bookObj of currentData["Bibeln"][testament]) {
+                if (bookObj[book]) {
+                    for (let chapterObj of bookObj[book]) {
+                        for (let chapter in chapterObj) {
+                            $("#chapterSelect").append(`<option value="${chapter}">${chapter}</option>`);
+                        }
+                    }
+                }
+            }
+            loadChapterText();
+        }
+
+        const loadChapterText = () => {
+            $("#chapterText").empty();
+            let testament = $("#testamentSelect").val();
+            let book = $("#bookSelect").val();
+            let chapter = $("#chapterSelect").val();
+            for (let bookObj of currentData["Bibeln"][testament]) {
+                if (bookObj[book]) {
+                    for (let chapterObj of bookObj[book]) {
+                        if (chapterObj[chapter]) {
+                            for (let verseObj of chapterObj[chapter]) {
+                                for (let verse in verseObj) {
+                                    let verseText = verseObj[verse];
+                                    let verseElement = `<p class="verse" data-verse="${verse}"><strong>${verse}.</strong> ${verseText}</p>`;
+                                    $("#chapterText").append(verseElement);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+		const loadVersesFromOtherBibles = (verse) => {
+			let testament = $("#testamentSelect").val();
+			let book = $("#bookSelect").val();
+			let chapter = $("#chapterSelect").val();
+		
+			// set title for the popup
+			$("#popupTitle").text(`${book} ${chapter}:${verse}`);
+		
+			$(".popup-content div").remove(); // remove divs if any exists
+			$("#versePopup").show();
+		
+			let promises = [];
+		
+			$("#bibleSelect option").each(function() {
+				let bibleUrl = $(this).val();
+				let bibleName = $(this).text();
+				
+				let promise = new Promise((resolve, reject) => {
+					setTimeout(() => {
+						reject(new Error("Request timeout"));
+					}, 1000); // Timeout after 5 seconds
+		
+					$.getJSON(bibleUrl, function(data) {
+						for (let bookObj of data["Bibeln"][testament]) {
+							if (bookObj[book]) {
+								for (let chapterObj of bookObj[book]) {
+									if (chapterObj[chapter]) {
+										for (let verseObj of chapterObj[chapter]) {
+											if (verseObj[verse]) {
+												let verseText = verseObj[verse];
+												resolve({
+													name: bibleName,
+													text: verseText.replace(`${verse}. `, '')
+												});
+											}
+										}
+									}
+								}
+							}
+						}
+					});
+				});
+		
+				promises.push(promise);
+			});
+		
+			Promise.allSettled(promises).then(function(results) {
+				let versesArray = results
+					.filter((result) => result.status === "fulfilled")
+					.map((result) => result.value)
+					.filter((value) => value !== undefined && value !== null);
+		
+				versesArray.sort((a, b) => {
+					return $("#bibleSelect option:contains('" + a.name + "')").index() - $("#bibleSelect option:contains('" + b.name + "')").index();
+				});
+		
+				for (let verseObj of versesArray) {
+					let verseElement = `<div><p><strong>${verseObj.name}:<br></strong> ${verseObj.text}</p></div>`;
+					$(".popup-content").append(verseElement);
+				}
+			}).catch((error) => {
+				console.log("An error occurred: ", error);
+			});
+		}
+
+
+
+        $("#bibleSelect").change(function() {
+            loadBible($(this).val());
+        });
+
+        $("#testamentSelect").change(loadBooks);
+        $("#bookSelect").change(loadChapters);
+        $("#chapterSelect").change(loadChapterText);
+
+        $("#darkModeToggle").click(function() {
+            $("body").toggleClass("dark-mode");
+            $(".popup-content").toggleClass("dark-mode");
+        });
+
+        $("#fontSizeSelect").change(function() {
+            let fontSize = $(this).val();
+            $("#textContainer").css("font-size", fontSize);
+            $(".popup-content").css("font-size", fontSize);
+        });
+
+        $("#fontFamilySelect").change(function() {
+            let fontFamily = $(this).val();
+            $("#textContainer").css("font-family", fontFamily);
+            $(".popup-content").css("font-family", fontFamily);
+        });
+
+        $(document).on("click", ".verse", function() {
+            loadVersesFromOtherBibles($(this).data("verse"));
+        });
+
+        $("#versePopup").click(function(e) {
+            if ($(e.target).is("#versePopup")) {
+                $(this).hide();
+            }
+        });
+
+        loadBible($("#bibleSelect").val());
+    </script>
+</body>
+</html>
