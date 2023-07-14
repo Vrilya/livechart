@@ -285,11 +285,12 @@
             loadVersesFromOtherBibles($(this).data("verse"));
         });
 
-        $("#versePopup").click(function(e) {
-            if ($(e.target).is("#versePopup")) {
-                $(this).hide();
-            }
-        });
+		$("#versePopup").click(function(e) {
+			if (!$(e.target).closest('.popup-content').length) {
+				$(this).hide();
+			}
+		});
+
 
         loadBible($("#bibleSelect").val());
     </script>
