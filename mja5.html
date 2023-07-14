@@ -252,7 +252,7 @@
 				let promise = new Promise((resolve, reject) => {
 					setTimeout(() => {
 						reject(new Error("Request timeout"));
-					}, 1000); // Timeout after 5 seconds
+					}, 2000); // Timeout after 5 seconds
 		
 					$.getJSON(bibleUrl, function(data) {
 						for (let bookObj of data["Bibeln"][testament]) {
