@@ -124,6 +124,42 @@
     </div>
     <script>
 	
+
+	let chapterText = document.getElementById('chapterText');
+	let start = null;
+	
+	chapterText.addEventListener('touchstart', function(e) {
+		start = e.touches[0].clientX;
+	}, false);
+	
+	chapterText.addEventListener('touchend', function(e) {
+		var end = e.changedTouches[0].clientX;
+		var swipeLength = end - start;
+	
+		if (swipeLength > 100) { // 100px right swipe
+			previousChapter();
+		} else if (swipeLength < -100) { // 100px left swipe
+			nextChapter();
+		}
+	}, false);
+	
+	function previousChapter() {
+		let chapterSelect = document.getElementById('chapterSelect');
+		if (chapterSelect.selectedIndex > 0) {
+			chapterSelect.selectedIndex -= 1;
+			loadChapterText();
+		}
+	}
+	
+	function nextChapter() {
+		let chapterSelect = document.getElementById('chapterSelect');
+		if (chapterSelect.selectedIndex < chapterSelect.length - 1) {
+			chapterSelect.selectedIndex += 1;
+			loadChapterText();
+		}
+	}
+	
+	
 		let popupWindow = document.getElementById('versePopup');
 		
 		popupWindow.addEventListener('click', function(event) {
@@ -291,8 +327,6 @@
         $(document).on("click", ".verse", function() {
             loadVersesFromOtherBibles($(this).data("verse"));
         });
-
-
 
         loadBible($("#bibleSelect").val());
     </script>
