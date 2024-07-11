@@ -5,15 +5,31 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kabbalistiska Livets Träd och Dödens Träd</title>
     <style>
-        body { margin: 0; padding: 0; overflow: hidden; }
+        body { margin: 0; padding: 0; overflow: hidden; transition: background-color 0.3s; }
         #canvas { width: 100vw; height: 100vh; }
+        #darkModeToggle {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            padding: 10px;
+            background-color: #f0f0f0;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        body.dark-mode { background-color: #333; }
+        body.dark-mode #darkModeToggle { background-color: #555; color: #fff; }
     </style>
 </head>
 <body>
     <canvas id="canvas"></canvas>
+    <button id="darkModeToggle">Toggle Dark Mode</button>
     <script>
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d');
+        const darkModeToggle = document.getElementById('darkModeToggle');
+        let isDarkMode = false;
 
         const sephiroth = [
             ["Keter", "#FFFFFF", "Metatron"],
@@ -72,7 +88,7 @@
                 [50, inverted ? 5 : 95]
             ];
 
-            ctx.strokeStyle = 'black';
+            ctx.strokeStyle = isDarkMode ? 'white' : 'black';
             ctx.lineWidth = 1;
             for (let [start, end] of connections) {
                 let [x1, y1] = positions[start];
@@ -94,11 +110,12 @@
                 if (mirrored) {
                     x = 100 - x;
                 }
-                const radius = Math.min(canvas.width, canvas.height) / 50;
+                // Öka storleken på sephiroterna och qliphorna
+                const radius = Math.min(canvas.width, canvas.height) / 30;
                 const centerX = startX + x * scaleX;
                 const centerY = startY + y * scaleY;
 
-                // Rita svart kontur
+                // Rita svart kontur oavsett läge
                 ctx.beginPath();
                 ctx.arc(centerX, centerY, radius + 2, 0, 2 * Math.PI);
                 ctx.fillStyle = 'black';
@@ -110,10 +127,12 @@
                 ctx.fillStyle = color;
                 ctx.fill();
 
-                ctx.font = `bold ${radius / 1.5}px Arial`;
+                // Öka textstorleken
+                ctx.font = `bold ${radius / 1.2}px Arial`;
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
 
+                // Rita texten med svart kontur och vit fyllning oavsett läge
                 ctx.strokeStyle = 'black';
                 ctx.lineWidth = 3;
                 ctx.strokeText(name, centerX, centerY);
@@ -132,13 +151,13 @@
 
             const treeWidth = canvas.width / 2;
             const treeHeight = canvas.height;
-            const titleHeight = 40; // Höjd för titeln
+            const titleHeight = 40;
             const scaleX = treeWidth / 100;
-            const scaleY = (treeHeight - titleHeight) / 100; // Justerad skala för Y-axeln
+            const scaleY = (treeHeight - titleHeight) / 100;
 
             // Rita titlar
             ctx.font = 'bold 24px Arial';
-            ctx.fillStyle = 'black';
+            ctx.fillStyle = isDarkMode ? 'white' : 'black';
             ctx.textAlign = 'center';
             ctx.fillText("Livets Träd (Etz Chaim)", treeWidth / 2, titleHeight / 2);
             ctx.fillText("Dödens Träd (Sitra Achra)", treeWidth * 1.5, titleHeight / 2);
@@ -173,7 +192,7 @@
 
             clearHighlight();
 
-            const radius = Math.min(canvas.width, canvas.height) / 50;
+            const radius = Math.min(canvas.width, canvas.height) / 30;
             for (let i = 0; i < lifeCenters.length; i++) {
                 const [x1, y1] = lifeCenters[i];
                 const [x2, y2] = deathCenters[i];
@@ -205,16 +224,16 @@
                     const boxWidth = textWidth + padding * 2;
                     const boxHeight = lineHeight * 2 + padding * 2;
 
-                    // Rita rundad rektangel med vit bakgrund och svart kontur
-                    ctx.fillStyle = 'white';
+                    // Rita rundad rektangel med bakgrund och kontur anpassad till läge
+                    ctx.fillStyle = isDarkMode ? '#333' : 'white';
                     drawRoundedRect(textX - boxWidth / 2, textY - boxHeight / 2, boxWidth, boxHeight, 10);
                     ctx.fill();
-                    ctx.strokeStyle = 'black';
+                    ctx.strokeStyle = isDarkMode ? 'white' : 'black';
                     ctx.lineWidth = 2;
                     ctx.stroke();
 
-                    // Rita text
-                    ctx.fillStyle = 'black';
+                    // Rita text med färg anpassad till läge
+                    ctx.fillStyle = isDarkMode ? 'white' : 'black';
                     const lines = text.split('\n');
                     lines.forEach((line, index) => {
                         ctx.fillText(line, textX, textY + (index - 0.5) * lineHeight);
@@ -226,8 +245,15 @@
             }
         }
 
+        function toggleDarkMode() {
+            isDarkMode = !isDarkMode;
+            document.body.classList.toggle('dark-mode');
+            drawTrees();
+        }
+
         window.addEventListener('resize', resizeCanvas);
         canvas.addEventListener('mousemove', onHover);
+        darkModeToggle.addEventListener('click', toggleDarkMode);
 
         resizeCanvas();
     </script>
