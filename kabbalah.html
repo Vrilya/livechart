@@ -20,15 +20,55 @@
         }
         body.dark-mode { background-color: #333; }
         body.dark-mode #darkModeToggle { background-color: #555; color: #fff; }
+        #infoWindow {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80%;
+            max-width: 600px;
+            height: 80%;
+            max-height: 400px;
+            background-color: white;
+            border: 2px solid black;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.5);
+            z-index: 1000;
+            overflow-y: auto;
+        }
+        #infoWindow.dark-mode {
+            background-color: #333;
+            color: white;
+            border-color: white;
+        }
+        #closeButton {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            cursor: pointer;
+            font-size: 20px;
+        }
+        #infoWindow h2 {
+            text-align: center;
+        }
     </style>
 </head>
 <body>
     <canvas id="canvas"></canvas>
     <button id="darkModeToggle">Toggle Dark Mode</button>
+    <div id="infoWindow">
+        <span id="closeButton">&times;</span>
+        <div id="infoContent"></div>
+    </div>
     <script>
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d');
         const darkModeToggle = document.getElementById('darkModeToggle');
+        const infoWindow = document.getElementById('infoWindow');
+        const infoContent = document.getElementById('infoContent');
+        const closeButton = document.getElementById('closeButton');
         let isDarkMode = false;
 
         const sephiroth = [
@@ -67,6 +107,109 @@
         let lifeCenters = [];
         let deathCenters = [];
         let lastHighlightedIndex = -1;
+
+        const treeInfo = {
+            0: {
+                title: "Keter / Thaumiel",
+                content: `
+                    <h3>Keter (Krona)</h3>
+                    <p>Keter representerar den högsta punkten i Livets träd och symboliserar det gudomliga ursprunget till all skapelse. Det är den första emanationen av Ein Sof (det oändliga) och representerar ren existens bortom all form och begränsning.</p>
+                    
+                    <h3>Thaumiel (Tvillinggudar)</h3>
+                    <p>Thaumiel är Keters skuggsida och representerar dualitet och splittring. Det symboliserar konflikten mellan motstridiga krafter och illusionen av separation från det gudomliga.</p>
+                `
+            },
+            1: {
+                title: "Chokmah / Ghagiel",
+                content: `
+                    <h3>Chokmah (Visdom)</h3>
+                    <p>Chokmah representerar den kreativa impulsen och den gudomliga visdomen. Det är den aktiva, maskulina kraften i skapelsen och symboliserar insikt och inspiration.</p>
+                    
+                    <h3>Ghagiel (De som hindrar)</h3>
+                    <p>Ghagiel är Chokmahs skuggsida och representerar förvirring och obalans. Det symboliserar missriktad energi och kaos som hindrar sann visdom och kreativitet.</p>
+                `
+            },
+            2: {
+                title: "Binah / Satariel",
+                content: `
+                    <h3>Binah (Förståelse)</h3>
+                    <p>Binah representerar den passiva, feminina kraften i skapelsen. Det symboliserar förståelse, analys och den strukturerande principen i universum.</p>
+                    
+                    <h3>Satariel (Döljande av Gud)</h3>
+                    <p>Satariel är Binahs skuggsida och representerar förvrängning och förnekelse av sanningen. Det symboliserar illusioner som döljer den gudomliga verkligheten.</p>
+                `
+            },
+            3: {
+                title: "Chesed / Gha'agsheblah",
+                content: `
+                    <h3>Chesed (Nåd)</h3>
+                    <p>Chesed representerar kärlek, nåd och barmhärtighet. Det symboliserar expansiv energi och den uppbyggande kraften i universum.</p>
+                    
+                    <h3>Gha'agsheblah (De som stör)</h3>
+                    <p>Gha'agsheblah är Cheseds skuggsida och representerar överdriven expansion och slöseri. Det symboliserar missbruk av makt och resurser.</p>
+                `
+            },
+            4: {
+                title: "Geburah / Golachab",
+                content: `
+                    <h3>Geburah (Styrka)</h3>
+                    <p>Geburah representerar rättvisa, styrka och disciplin. Det symboliserar den nedbrytande och renande kraften i universum.</p>
+                    
+                    <h3>Golachab (De brinnande)</h3>
+                    <p>Golachab är Geburahs skuggsida och representerar brutalitet och destruktiv kraft. Det symboliserar hämnd och obarmhärtig förstörelse.</p>
+                `
+            },
+            5: {
+                title: "Tiferet / Tagiriron",
+                content: `
+                    <h3>Tiferet (Skönhet)</h3>
+                    <p>Tiferet representerar harmoni, balans och skönhet. Det är den centrala punkten i Livets träd och symboliserar integration av motsatser.</p>
+                    
+                    <h3>Tagiriron (De som strider)</h3>
+                    <p>Tagiriron är Tiferets skuggsida och representerar obalans och splittring. Det symboliserar egoism och materialism som stör den gudomliga harmonin.</p>
+                `
+            },
+            6: {
+                title: "Netzach / Harab Serapel",
+                content: `
+                    <h3>Netzach (Seger)</h3>
+                    <p>Netzach representerar känslor, passion och instinkt. Det symboliserar kreativitet, kärlek och den drivande kraften bakom naturens cykler.</p>
+                    
+                    <h3>Harab Serapel (Dödens raviner)</h3>
+                    <p>Harab Serapel är Netzachs skuggsida och representerar överdriven känslomässighet och själviskhet. Det symboliserar besatthet och destruktiva begär.</p>
+                `
+            },
+            7: {
+                title: "Hod / Samael",
+                content: `
+                    <h3>Hod (Prakt)</h3>
+                    <p>Hod representerar intellekt, kommunikation och logik. Det symboliserar struktur, ordning och den rationella aspekten av medvetandet.</p>
+                    
+                    <h3>Samael (Guds gift)</h3>
+                    <p>Samael är Hods skuggsida och representerar lögner och falskhet. Det symboliserar manipulation och missbruk av kunskap och kommunikation.</p>
+                `
+            },
+            8: {
+                title: "Yesod / Gamaliel",
+                content: `
+                    <h3>Yesod (Grund)</h3>
+                    <p>Yesod representerar det undermedvetna, drömmar och fantasi. Det symboliserar den astrala världen och fungerar som en bro mellan de högre sfärerna och den fysiska världen.</p>
+                    
+                    <h3>Gamaliel (De obscena)</h3>
+                    <p>Gamaliel är Yesods skuggsida och representerar förvrängning av det undermedvetna. Det symboliserar illusion, förvirring och sexuell perversion.</p>
+                `
+            },
+            9: {
+                title: "Malkuth / Nehemoth",
+                content: `
+                    <h3>Malkuth (Kungadöme)</h3>
+                    <p>Malkuth representerar den fysiska världen och vår vardagliga verklighet. Det symboliserar manifestation och är den sista emanationen i Livets träd.</p>
+                    
+                    <h3>Nehemoth (De klagande)</h3>
+                    <p>Nehemoth är Malkuths skuggsida och representerar den mörka sidan av den materiella världen. Det symboliserar demonisk besatthet och förtvivlan över den fysiska existensen.</p>
+                `
+            }
+        };
 
         function resizeCanvas() {
             canvas.width = window.innerWidth;
@@ -230,15 +373,47 @@
             }
         }
 
+        function onClick(event) {
+            const rect = canvas.getBoundingClientRect();
+            const x = event.clientX - rect.left;
+            const y = event.clientY - rect.top;
+
+            const radius = Math.min(canvas.width, canvas.height) / 30;
+            for (let i = 0; i < lifeCenters.length; i++) {
+                const [x1, y1] = lifeCenters[i];
+                const [x2, y2] = deathCenters[i];
+
+                if ((Math.abs(x - x1) <= radius && Math.abs(y - y1) <= radius) ||
+                    (Math.abs(x - x2) <= radius && Math.abs(y - y2) <= radius)) {
+                    showInfoWindow(i);
+                    break;
+                }
+            }
+        }
+
+        function showInfoWindow(index) {
+            const info = treeInfo[index];
+            if (info) {
+                infoContent.innerHTML = `<h2>${info.title}</h2>${info.content}`;
+                infoWindow.style.display = 'block';
+                infoWindow.classList.toggle('dark-mode', isDarkMode);
+            }
+        }
+
         function toggleDarkMode() {
             isDarkMode = !isDarkMode;
             document.body.classList.toggle('dark-mode');
+            infoWindow.classList.toggle('dark-mode', isDarkMode);
             drawTrees();
         }
 
         window.addEventListener('resize', resizeCanvas);
         canvas.addEventListener('mousemove', onHover);
+        canvas.addEventListener('click', onClick);
         darkModeToggle.addEventListener('click', toggleDarkMode);
+        closeButton.addEventListener('click', () => {
+            infoWindow.style.display = 'none';
+        });
 
         resizeCanvas();
     </script>
