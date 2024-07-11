@@ -74,7 +74,7 @@
             drawTrees();
         }
 
-        function drawTree(startX, startY, scaleX, scaleY, nodes, inverted = false, mirrored = false) {
+        function drawTree(startX, startY, scaleX, scaleY, nodes, inverted = false) {
             const positions = [
                 [50, inverted ? 95 : 5],
                 [25, inverted ? 80 : 20],
@@ -93,10 +93,6 @@
             for (let [start, end] of connections) {
                 let [x1, y1] = positions[start];
                 let [x2, y2] = positions[end];
-                if (mirrored) {
-                    x1 = 100 - x1;
-                    x2 = 100 - x2;
-                }
                 ctx.beginPath();
                 ctx.moveTo(startX + x1 * scaleX, startY + y1 * scaleY);
                 ctx.lineTo(startX + x2 * scaleX, startY + y2 * scaleY);
@@ -107,32 +103,24 @@
             for (let i = 0; i < nodes.length; i++) {
                 const [name, color, _] = nodes[i];
                 let [x, y] = positions[i];
-                if (mirrored) {
-                    x = 100 - x;
-                }
-                // Öka storleken på sephiroterna och qliphorna
                 const radius = Math.min(canvas.width, canvas.height) / 30;
                 const centerX = startX + x * scaleX;
                 const centerY = startY + y * scaleY;
 
-                // Rita svart kontur oavsett läge
                 ctx.beginPath();
                 ctx.arc(centerX, centerY, radius + 2, 0, 2 * Math.PI);
                 ctx.fillStyle = 'black';
                 ctx.fill();
 
-                // Rita noden
                 ctx.beginPath();
                 ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
                 ctx.fillStyle = color;
                 ctx.fill();
 
-                // Öka textstorleken
                 ctx.font = `bold ${radius / 1.2}px Arial`;
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
 
-                // Rita texten med svart kontur och vit fyllning oavsett läge
                 ctx.strokeStyle = 'black';
                 ctx.lineWidth = 3;
                 ctx.strokeText(name, centerX, centerY);
@@ -155,7 +143,6 @@
             const scaleX = treeWidth / 100;
             const scaleY = (treeHeight - titleHeight) / 100;
 
-            // Rita titlar
             ctx.font = 'bold 24px Arial';
             ctx.fillStyle = isDarkMode ? 'white' : 'black';
             ctx.textAlign = 'center';
@@ -163,7 +150,7 @@
             ctx.fillText("Dödens Träd (Sitra Achra)", treeWidth * 1.5, titleHeight / 2);
 
             lifeCenters = drawTree(0, titleHeight, scaleX, scaleY, sephiroth);
-            deathCenters = drawTree(treeWidth, titleHeight, scaleX, scaleY, qliphoth, true, true);
+            deathCenters = drawTree(treeWidth, titleHeight, scaleX, scaleY, qliphoth, true);
         }
 
         function clearHighlight() {
@@ -224,7 +211,6 @@
                     const boxWidth = textWidth + padding * 2;
                     const boxHeight = lineHeight * 2 + padding * 2;
 
-                    // Rita rundad rektangel med bakgrund och kontur anpassad till läge
                     ctx.fillStyle = isDarkMode ? '#333' : 'white';
                     drawRoundedRect(textX - boxWidth / 2, textY - boxHeight / 2, boxWidth, boxHeight, 10);
                     ctx.fill();
@@ -232,7 +218,6 @@
                     ctx.lineWidth = 2;
                     ctx.stroke();
 
-                    // Rita text med färg anpassad till läge
                     ctx.fillStyle = isDarkMode ? 'white' : 'black';
                     const lines = text.split('\n');
                     lines.forEach((line, index) => {
