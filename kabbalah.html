@@ -25,7 +25,7 @@
             font-family: 'Roboto', sans-serif;
             background: var(--light-bg);
             color: var(--light-text);
-            transition: background-color 0.3s, color 0.3s;
+            transition: background-color 0.5s, color 0.5s;
         }
 
         body.dark-mode {
@@ -52,6 +52,7 @@
             font-family: 'Montserrat', sans-serif;
             font-weight: bold;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
         }
 
         #darkModeToggle:hover {
@@ -68,7 +69,7 @@
             position: fixed;
             top: 50%;
             left: 50%;
-            transform: translate(-50%, -50%);
+            transform: translate(-50%, -50%) scale(0.9);
             width: 80%;
             max-width: 600px;
             height: 80%;
@@ -76,12 +77,18 @@
             background-color: var(--light-bg);
             border: 2px solid var(--light-accent);
             border-radius: 15px;
-            padding: 30px;
             box-shadow: 0 10px 25px rgba(0,0,0,0.2);
             z-index: 1000;
-            overflow-y: auto;
             font-family: 'Montserrat', sans-serif;
-            transition: all 0.3s ease;
+            transition: all 0.5s ease;
+            opacity: 0;
+            padding: 20px; /* Lägg till padding */
+            box-sizing: border-box; /* Säkerställ box-sizing */
+        }
+
+        #infoWindow.show {
+            transform: translate(-50%, -50%) scale(1);
+            opacity: 1;
         }
 
         #infoWindow.dark-mode {
@@ -90,25 +97,75 @@
             border-color: var(--dark-accent);
         }
 
+        #infoHeader {
+            position: sticky;
+            top: 0;
+            background-color: inherit;
+            padding: 20px 30px;
+            border-bottom: 1px solid var(--light-accent);
+            border-radius: 15px 15px 0 0;
+            z-index: 2;
+        }
+
+        #infoWindow.dark-mode #infoHeader {
+            border-bottom-color: var(--dark-accent);
+        }
+
         #closeButton {
             position: absolute;
-            top: 15px;
-            right: 15px;
+            top: 20px;
+            right: 20px;
             cursor: pointer;
             font-size: 24px;
             color: var(--light-accent);
-            transition: color 0.3s;
+            transition: color 0.3s, transform 0.3s;
         }
 
         #closeButton:hover {
             color: var(--primary);
+            transform: rotate(90deg);
+        }
+
+        #infoContent {
+            padding: 0 30px 30px;
+            height: calc(100% - 80px);
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: var(--primary) var(--light-bg);
+            box-sizing: border-box; /* Säkerställ box-sizing */
+        }
+
+        #infoWindow.dark-mode #infoContent {
+            scrollbar-color: var(--secondary) var(--dark-bg);
+        }
+
+        #infoContent::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        #infoContent::-webkit-scrollbar-track {
+            background: var(--light-bg);
+            border-radius: 4px;
+        }
+
+        #infoWindow.dark-mode #infoContent::-webkit-scrollbar-track {
+            background: var(--dark-bg);
+        }
+
+        #infoContent::-webkit-scrollbar-thumb {
+            background-color: var(--primary);
+            border-radius: 4px;
+        }
+
+        #infoWindow.dark-mode #infoContent::-webkit-scrollbar-thumb {
+            background-color: var(--secondary);
         }
 
         #infoWindow h2 {
             text-align: center;
             color: var(--primary);
             font-size: 28px;
-            margin-bottom: 20px;
+            margin: 0 0 20px;
         }
 
         #infoWindow h3 {
@@ -127,7 +184,6 @@
             #infoWindow {
                 width: 95%;
                 height: 95%;
-                padding: 20px;
             }
         }
 
@@ -136,7 +192,7 @@
             position: fixed;
             top: 50%;
             left: 50%;
-            transform: translate(-50%, -50%);
+            transform: translate(-50%, -50%) scale(0.9);
             width: 170px;
             background-color: var(--light-bg);
             border: 2px solid var(--light-accent);
@@ -147,12 +203,67 @@
             font-family: 'Montserrat', sans-serif;
             transition: all 0.3s ease;
             color: var(--light-text);
+            opacity: 0;
+        }
+
+        .hover-info.show {
+            transform: translate(-50%, -50%) scale(1);
+            opacity: 1;
         }
 
         .hover-info.dark-mode {
             background-color: var(--dark-bg);
             color: var(--dark-text);
             border-color: var(--dark-accent);
+        }
+
+        #loadingOverlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .fade-out {
+            animation: fadeOut 1s ease-out forwards;
+        }
+
+        @keyframes fadeOut {
+            0% { opacity: 1; }
+            100% { opacity: 0; visibility: hidden; }
+        }
+
+        #introText {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 24px;
+            font-weight: bold;
+            text-align: center;
+            color: white;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
         }
     </style>
 </head>
@@ -162,18 +273,28 @@
         <i class="fas fa-moon"></i> Dark Mode
     </button>
     <div id="infoWindow">
-        <i id="closeButton" class="fas fa-times"></i>
+        <div id="infoHeader">
+            <h2 id="infoTitle"></h2>
+            <i id="closeButton" class="fas fa-times"></i>
+        </div>
         <div id="infoContent"></div>
     </div>
     <div id="hoverInfo" class="hover-info"></div>
+    <div id="loadingOverlay">
+        <div class="spinner"></div>
+    </div>
+
     <script>
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d');
         const darkModeToggle = document.getElementById('darkModeToggle');
         const infoWindow = document.getElementById('infoWindow');
+        const infoTitle = document.getElementById('infoTitle');
         const infoContent = document.getElementById('infoContent');
         const closeButton = document.getElementById('closeButton');
         const hoverInfo = document.getElementById('hoverInfo');
+        const loadingOverlay = document.getElementById('loadingOverlay');
+        const introText = document.getElementById('introText');
         let isDarkMode = false;
 
         const sephiroth = [
@@ -218,100 +339,100 @@
                 title: "Keter / Thaumiel",
                 content: `
                     <h3>Keter (Krona)</h3>
-                    <p>Keter representerar den högsta punkten i Livets träd och symboliserar det gudomliga ursprunget till all skapelse. Det är den första emanationen av Ein Sof (det oändliga) och representerar ren existens bortom all form och begränsning.</p>
+                    <p>Keter representerar den högsta punkten i Livets träd och symboliserar det gudomliga ursprunget till all skapelse. Det är den första emanationen av Ein Sof (det oändliga) och representerar ren existens bortom all form och begränsning. I Kabbalistisk tradition anses Keter vara den mest sublima av sefiroterna, en plats där människans förståelse och det gudomliga möts i en form av enhet som ligger bortom tid och rum. Keter är inte bara en symbol för det högsta gudomliga ljuset, utan även för den oändliga potentialen och det rena medvetandet som genomsyrar hela skapelsen. Den belyser ett tillstånd av ren andlig klarhet och insikt, där alla motsättningar löses upp och den sanna naturen av verkligheten blir uppenbar.</p>
                     
                     <h3>Thaumiel (Tvillinggudar)</h3>
-                    <p>Thaumiel är Keters skuggsida och representerar dualitet och splittring. Det symboliserar konflikten mellan motstridiga krafter och illusionen av separation från det gudomliga.</p>
+                    <p>Thaumiel är Keters skuggsida och representerar dualitet och splittring. Det symboliserar konflikten mellan motstridiga krafter och illusionen av separation från det gudomliga. I den kabbalistiska läran om Qlippoth (skuggsefiroterna), ses Thaumiel som en manifestation av disharmoni och kaos, där de enande principerna i Keter delas upp i två motstridiga makter. Denna splittring speglar människans inre kamp mellan ljus och mörker, ordning och kaos. Thaumiel illustrerar hur det gudomliga ljuset kan förvrängas och skapa illusioner av oenighet och separation, och belyser vikten av att återvända till enhet och balans genom andlig utveckling och självinsikt.</p>
                 `
             },
             1: {
                 title: "Chokmah / Ghagiel",
                 content: `
                     <h3>Chokmah (Visdom)</h3>
-                    <p>Chokmah representerar den kreativa impulsen och den gudomliga visdomen. Det är den aktiva, maskulina kraften i skapelsen och symboliserar insikt och inspiration.</p>
+                    <p>Chokmah representerar den kreativa impulsen och den gudomliga visdomen. Det är den andra sefiran i Livets träd och symboliserar insikt, inspiration och den aktiva, maskulina kraften i skapelsen. Chokmah betraktas som källan till visdom och den råa, obegränsade energin som driver all kreativ aktivitet. I den kabbalistiska traditionen anses Chokmah vara den primära drivkraften bakom kosmos skapelse, en impuls som ger form och riktning åt potentialen i Keter. Genom Chokmah uppenbaras den gudomliga viljan och det högre medvetandet som guidar universum mot sin fulla utveckling. Det är en sefira som belyser vikten av intuition och direkt kunskap, där förståelse inte är ett resultat av logisk analys utan av omedelbar och djup insikt. Chokmah representerar också balans och harmoni i den skapande processen, där visdom och kreativitet förenas för att skapa en harmonisk och ordnad verklighet.</p>
                     
                     <h3>Ghagiel (De som hindrar)</h3>
-                    <p>Ghagiel är Chokmahs skuggsida och representerar förvirring och obalans. Det symboliserar missriktad energi och kaos som hindrar sann visdom och kreativitet.</p>
+                    <p>Ghagiel är Chokmahs skuggsida och representerar förvirring och obalans. Det är en qlippa inom läran om Qlippoth, som symboliserar missriktad energi och kaos som hindrar sann visdom och kreativitet. Ghagiel reflekterar de krafter som bryter ned och skapar dissonans, vilket leder till disharmoni och förlorad riktning. I Ghagiel finner vi manifestationer av felaktiga idéer och illusioner som skymmer den klara insikten som Chokmah erbjuder. Denna skuggsida illustrerar hur den kreativa kraften kan bli förvrängd och missbrukad, vilket resulterar i andlig förvirring och stagnation. Ghagiel understryker farorna med att förlora kontakten med den sanna visdomen och belyser behovet av att övervinna inre hinder genom självrannsakan och andlig rening. Genom att konfrontera och integrera dessa skuggaspekter kan man återvinna balansen och återupptäcka den sanna naturen av kreativ kraft och gudomlig visdom.</p>
                 `
             },
             2: {
                 title: "Binah / Satariel",
                 content: `
                     <h3>Binah (Förståelse)</h3>
-                    <p>Binah representerar den passiva, feminina kraften i skapelsen. Det symboliserar förståelse, analys och den strukturerande principen i universum.</p>
+                    <p>Binah representerar den passiva, feminina kraften i skapelsen och är den tredje sefiran i Livets träd. Den symboliserar förståelse, analys och den strukturerande principen i universum. Binah är den aspekt av det gudomliga som ger form och ordning åt den kreativa energin som emanerar från Chokmah. Genom Binah får den råa potentialen en konkret struktur och definierade gränser, vilket gör det möjligt för skapelsen att manifesteras i en harmonisk och sammanhängande form. I den kabbalistiska traditionen anses Binah vara den stora modern, som föder fram och när all existens med sitt närande och vårdande väsen. Binah belyser vikten av djupgående förståelse och reflektion, där visdom omvandlas till praktisk kunskap genom en noggrann och metodisk process. Den symboliserar också den introspektiva resa som leder till inre klarhet och insikt om den sanna naturen av verkligheten.</p>
                     
                     <h3>Satariel (Döljande av Gud)</h3>
-                    <p>Satariel är Binahs skuggsida och representerar förvrängning och förnekelse av sanningen. Det symboliserar illusioner som döljer den gudomliga verkligheten.</p>
+                    <p>Satariel är Binahs skuggsida och representerar förvrängning och förnekelse av sanningen. Det är en qlippa inom läran om Qlippoth, som symboliserar illusioner och falskhet som döljer den gudomliga verkligheten. Satariel speglar de krafter som skapar förvirring och osanning, vilket leder till andlig blindhet och separation från den gudomliga källan. I Satariel finner vi manifestationer av hemlighetsfullhet och gömda sanningar, där den strukturerande principen i Binah blir till en barriär som hindrar klarhet och insikt. Denna skuggsida illustrerar hur förståelse kan förvrängas till rigiditet och stagnation, vilket skapar ett tillstånd av andligt mörker och förlorad riktning. Satariel understryker farorna med att fastna i illusioner och falska uppfattningar, och belyser behovet av att genomskåda dessa hinder genom andlig disciplin och självrannsakan. Genom att konfrontera och övervinna dessa skuggaspekter kan man återfinna den sanna klarheten och förståelsen som Binah erbjuder.</p>
                 `
             },
             3: {
                 title: "Chesed / Gha'agsheblah",
                 content: `
                     <h3>Chesed (Nåd)</h3>
-                    <p>Chesed representerar kärlek, nåd och barmhärtighet. Det symboliserar expansiv energi och den uppbyggande kraften i universum.</p>
+                    <p>Chesed representerar kärlek, nåd och barmhärtighet, och är den fjärde sefiran i Livets träd. Den symboliserar expansiv energi och den uppbyggande kraften i universum. Chesed är den gudomliga egenskapen av generositet och välvilja, som sprider sig fritt och skänker överflöd till hela skapelsen. I den kabbalistiska traditionen anses Chesed vara källan till allomfattande kärlek och medkänsla, en kraft som övervinner alla hinder och förenar alla delar av universum i en harmonisk helhet. Genom Chesed uppenbaras den gudomliga viljan att skapa och bevara, att ge och förlåta. Denna sefira belyser vikten av osjälviskhet och storsinthet, där den individuella viljan underordnas den större godheten. Chesed representerar också balans mellan rättvisa och nåd, där kärleken är stark nog att upprätthålla rättvisa men mjuk nog att visa barmhärtighet.</p>
                     
                     <h3>Gha'agsheblah (De som stör)</h3>
-                    <p>Gha'agsheblah är Cheseds skuggsida och representerar överdriven expansion och slöseri. Det symboliserar missbruk av makt och resurser.</p>
+                    <p>Gha'agsheblah är Cheseds skuggsida och representerar överdriven expansion och slöseri. Det är en qlippa inom läran om Qlippoth, som symboliserar missbruk av makt och resurser. Gha'agsheblah speglar de krafter som leder till överdrift och obalanserad generositet, vilket resulterar i förlust och förstörelse istället för uppbyggnad och tillväxt. I Gha'agsheblah finner vi manifestationer av oansvarighet och brist på återhållsamhet, där den expansiva energin i Chesed blir till en destruktiv kraft som tömmer resurser och skapar kaos. Denna skuggsida illustrerar hur barmhärtighet kan förvrängas till slöseri och överflöd, vilket leder till att den ursprungliga välviljan förloras i överdrifter. Gha'agsheblah understryker farorna med att inte sätta gränser och att låta generositeten gå till spillo, och belyser behovet av att hitta en balans genom självdiciplin och medveten användning av resurser. Genom att konfrontera och integrera dessa skuggaspekter kan man återvinna den sanna kraften av nåd och kärlek som Chesed erbjuder.</p>
                 `
             },
             4: {
                 title: "Geburah / Golachab",
                 content: `
                     <h3>Geburah (Styrka)</h3>
-                    <p>Geburah representerar rättvisa, styrka och disciplin. Det symboliserar den nedbrytande och renande kraften i universum.</p>
-                    
+                    <p>Geburah representerar rättvisa, styrka och disciplin, och är den femte sefiran i Livets träd. Den symboliserar den nedbrytande och renande kraften i universum. Geburah är den gudomliga egenskapen av gränssättning och makt, en kraft som upprätthåller ordning och säkerställer att rättvisa skipas. I den kabbalistiska traditionen anses Geburah vara den kraft som skyddar och bevarar genom att avlägsna det som är skadligt eller onödigt, vilket gör att det goda kan blomstra. Genom Geburah uppenbaras den gudomliga viljan att skapa balans och harmoni genom prövningar och utmaningar. Denna sefira belyser vikten av disciplin och beslutsamhet, där styrka används för att övervinna hinder och motgångar. Geburah representerar också balans mellan kraft och barmhärtighet, där rättvisa är stark nog att stå fast men rättvis nog att vara rättvis.</p>
+
                     <h3>Golachab (De brinnande)</h3>
-                    <p>Golachab är Geburahs skuggsida och representerar brutalitet och destruktiv kraft. Det symboliserar hämnd och obarmhärlig förstörelse.</p>
+                    <p>Golachab är Geburahs skuggsida och representerar brutalitet och destruktiv kraft. Det är en qlippa inom läran om Qlippoth, som symboliserar hämnd och obarmhärtig förstörelse. Golachab speglar de krafter som leder till våldsamhet och överdriven aggression, vilket resulterar i kaos och ruin istället för rening och rättvisa. I Golachab finner vi manifestationer av obalans och ursinne, där den renande kraften i Geburah blir till en destruktiv kraft som orsakar skada och förintelse. Denna skuggsida illustrerar hur styrka kan förvrängas till brutalitet och rättvisa till hämnd, vilket leder till att den ursprungliga avsikten förloras i våld och förstörelse. Golachab understryker farorna med att förlora kontrollen över sin kraft och att låta aggressionen ta över, och belyser behovet av att hitta en balans genom självbehärskning och medveten användning av sin styrka. Genom att konfrontera och integrera dessa skuggaspekter kan man återvinna den sanna kraften av rättvisa och disciplin som Geburah erbjuder.</p>
                 `
             },
             5: {
                 title: "Tiferet / Tagiriron",
                 content: `
                     <h3>Tiferet (Skönhet)</h3>
-                    <p>Tiferet representerar harmoni, balans och skönhet. Det är den centrala punkten i Livets träd och symboliserar integration av motsatser.</p>
+                    <p>Tiferet representerar harmoni, balans och skönhet, och är den sjätte sefiran i Livets träd. Den symboliserar integration av motsatser och fungerar som den centrala punkten där alla krafter möts och förenas i en harmonisk helhet. Tiferet är den gudomliga egenskapen av skönhet som uppenbaras genom balans mellan kärlek och styrka, nåd och rättvisa. I den kabbalistiska traditionen anses Tiferet vara hjärtat i Livets träd, en plats där den mänskliga själen kan förenas med det gudomliga genom en djup och intuitiv förståelse av universums skönhet och ordning. Genom Tiferet uppenbaras den gudomliga viljan att skapa en harmonisk värld där alla aspekter av skapelsen samverkar i perfekt balans. Denna sefira belyser vikten av inre frid och enhet, där individens olika delar förenas i en integrerad och sammanhängande helhet. Tiferet representerar också medkänsla och empati, där skönheten i att förstå och känna med andra är en central aspekt av den andliga resan.</p>
                     
                     <h3>Tagiriron (De som strider)</h3>
-                    <p>Tagiriron är Tiferets skuggsida och representerar obalans och splittring. Det symboliserar egoism och materialism som stör den gudomliga harmonin.</p>
+                    <p>Tagiriron är Tiferets skuggsida och representerar obalans och splittring. Det är en qlippa inom läran om Qlippoth, som symboliserar egoism och materialism som stör den gudomliga harmonin. Tagiriron speglar de krafter som leder till konflikt och disharmoni, vilket resulterar i en splittrad och kaotisk tillvaro istället för integration och balans. I Tagiriron finner vi manifestationer av själviskhet och ytlighet, där den skönhet och balans som Tiferet erbjuder blir till en arena för strid och oenighet. Denna skuggsida illustrerar hur harmoni kan förvrängas till obalans och skönhet till ytlighet, vilket leder till att den ursprungliga harmonin förloras i konflikter och dissonans. Tagiriron understryker farorna med att låta egoism och materialism ta över, och belyser behovet av att återfinna balansen genom självrannsakan och medveten strävan efter harmoni. Genom att konfrontera och integrera dessa skuggaspekter kan man återvinna den sanna kraften av harmoni och skönhet som Tiferet erbjuder.</p>
                 `
             },
             6: {
                 title: "Netzach / Harab Serapel",
                 content: `
                     <h3>Netzach (Seger)</h3>
-                    <p>Netzach representerar känslor, passion och instinkt. Det symboliserar kreativitet, kärlek och den drivande kraften bakom naturens cykler.</p>
+                    <p>Netzach representerar känslor, passion och instinkt, och är den sjunde sefiran i Livets träd. Den symboliserar kreativitet, kärlek och den drivande kraften bakom naturens cykler. Netzach är den gudomliga egenskapen av segerrik uthållighet och oändlig energi, som ger kraft åt alla livets processer och manifestationer. I den kabbalistiska traditionen anses Netzach vara källan till den passion och det engagemang som driver individen att övervinna hinder och uppnå sina mål. Genom Netzach uppenbaras den gudomliga viljan att skapa och upprätthålla liv, att inspirera till skönhet och konst genom känslomässig uttryckskraft. Denna sefira belyser vikten av att omfamna sina känslor och instinkter som en källa till styrka och inspiration, där kärlek och passion förenar sig för att skapa ett dynamiskt och levande universum. Netzach representerar också triumfen av kreativ energi och den oändliga cykeln av liv och förnyelse, där seger över svårigheter leder till ständig tillväxt och utveckling.</p>
                     
                     <h3>Harab Serapel (Dödens raviner)</h3>
-                    <p>Harab Serapel är Netzachs skuggsida och representerar överdriven känslomässighet och själviskhet. Det symboliserar besatthet och destruktiva begär.</p>
+                    <p>Harab Serapel är Netzachs skuggsida och representerar överdriven känslomässighet och själviskhet. Det är en qlippa inom läran om Qlippoth, som symboliserar besatthet och destruktiva begär. Harab Serapel speglar de krafter som leder till emotionell obalans och själviskhet, vilket resulterar i en förvrängd och destruktiv passion istället för kreativitet och kärlek. I Harab Serapel finner vi manifestationer av överdrift och otyglade begär, där den drivande kraften i Netzach blir till en destruktiv kraft som förbrukar och förtär. Denna skuggsida illustrerar hur passion kan förvrängas till besatthet och instinkt till destruktiva impulser, vilket leder till att den ursprungliga kreativiteten och kärleken förloras i självdestruktiva mönster. Harab Serapel understryker farorna med att låta känslomässiga överdrifter och själviska begär dominera, och belyser behovet av att återfinna balans genom självrannsakan och medveten kontroll över sina känslor. Genom att konfrontera och integrera dessa skuggaspekter kan man återvinna den sanna kraften av kreativitet och kärlek som Netzach erbjuder.</p>
                 `
             },
             7: {
                 title: "Hod / Samael",
                 content: `
                     <h3>Hod (Prakt)</h3>
-                    <p>Hod representerar intellekt, kommunikation och logik. Det symboliserar struktur, ordning och den rationella aspekten av medvetandet.</p>
+                    <p>Hod representerar intellekt, kommunikation och logik, och är den åttonde sefiran i Livets träd. Den symboliserar struktur, ordning och den rationella aspekten av medvetandet. Hod är den gudomliga egenskapen av klarhet och precision, som ger form åt tankar och idéer genom noggrant övervägande och systematisering. I den kabbalistiska traditionen anses Hod vara källan till vetenskaplig förståelse och intellektuell insikt, en kraft som organiserar och förklarar universums komplexitet genom rationell analys och kommunikativ förmåga. Genom Hod uppenbaras den gudomliga viljan att skapa en begriplig och sammanhängande verklighet, där kunskap och visdom delas och förmedlas på ett klart och effektivt sätt. Denna sefira belyser vikten av att använda logik och intellekt för att lösa problem och förstå världen, där struktur och ordning leder till en djupare insikt och klarhet. Hod representerar också balans mellan tanke och uttryck, där den rationella analysen harmoniseras med effektiv kommunikation för att skapa en sammanhängande och praktisk förståelse av verkligheten.</p>
                     
                     <h3>Samael (Guds gift)</h3>
-                    <p>Samael är Hods skuggsida och representerar lögner och falskhet. Det symboliserar manipulation och missbruk av kunskap och kommunikation.</p>
+                    <p>Samael är Hods skuggsida och representerar lögner och falskhet. Det är en qlippa inom läran om Qlippoth, som symboliserar manipulation och missbruk av kunskap och kommunikation. Samael speglar de krafter som leder till förvrängning av sanningen och användning av intellektet för destruktiva ändamål, vilket resulterar i förvirring och vilseledning istället för klarhet och insikt. I Samael finner vi manifestationer av bedrägeri och oärlighet, där den strukturerande principen i Hod blir till ett verktyg för manipulation och kontroll. Denna skuggsida illustrerar hur intellektet kan förvrängas till ett medel för falskhet och lögner, vilket leder till att den ursprungliga syftet med kunskap och kommunikation förloras i manipulation och missbruk. Samael understryker farorna med att använda sin intellektuella kapacitet för själviska och oetiska syften, och belyser behovet av att återvinna integriteten och sanningen genom självrannsakan och etisk medvetenhet. Genom att konfrontera och integrera dessa skuggaspekter kan man återvinna den sanna kraften av intellekt och kommunikation som Hod erbjuder.</p>
                 `
             },
             8: {
                 title: "Yesod / Gamaliel",
                 content: `
                     <h3>Yesod (Grund)</h3>
-                    <p>Yesod representerar det undermedvetna, drömmar och fantasi. Det symboliserar den astrala världen och fungerar som en bro mellan de högre sfärerna och den fysiska världen.</p>
+                    <p>Yesod representerar det undermedvetna, drömmar och fantasi, och är den nionde sefiran i Livets träd. Den symboliserar den astrala världen och fungerar som en bro mellan de högre sfärerna och den fysiska världen. Yesod är den gudomliga egenskapen av koppling och överföring, en kanal genom vilken energier och influenser från de högre sefiroterna manifesteras i den materiella världen. I den kabbalistiska traditionen anses Yesod vara fundamentet för all form och struktur i den fysiska verkligheten, en plats där drömmar och visioner förenas med praktisk handling och manifestation. Genom Yesod uppenbaras den gudomliga viljan att förena ande och materia, att omvandla abstrakta idéer till konkreta realiteter. Denna sefira belyser vikten av att förstå och integrera sitt undermedvetna, där drömmar och fantasi fungerar som en källa till kreativitet och inspiration. Yesod representerar också balans mellan det medvetna och det undermedvetna, där den inre världen av drömmar och känslor harmoniseras med den yttre världen av handling och manifestation.</p>
                     
                     <h3>Gamaliel (De obscena)</h3>
-                    <p>Gamaliel är Yesods skuggsida och representerar förvrängning av det undermedvetna. Det symboliserar illusion, förvirring och sexuell perversion.</p>
+                    <p>Gamaliel är Yesods skuggsida och representerar förvrängning av det undermedvetna. Det är en qlippa inom läran om Qlippoth, som symboliserar illusion, förvirring och sexuell perversion. Gamaliel speglar de krafter som leder till en förvrängd och osund relation med det undermedvetna, vilket resulterar i kaotiska och destruktiva drömmar och fantasier istället för klargörande och inspirerande visioner. I Gamaliel finner vi manifestationer av illusioner och falska perceptioner, där den förbindande principen i Yesod blir till en källa av förvirring och desorientering. Denna skuggsida illustrerar hur det undermedvetna kan förvrängas till en arena för perversion och oordning, vilket leder till att den ursprungliga kopplingen mellan de högre sfärerna och den fysiska världen bryts och skapar en tillvaro av illusion och kaos. Gamaliel understryker farorna med att låta sina undermedvetna impulser och begär ta överhanden, och belyser behovet av att återfinna klarheten och harmonin genom självrannsakan och medveten bearbetning av sina inre världar. Genom att konfrontera och integrera dessa skuggaspekter kan man återvinna den sanna kraften av drömmar och fantasi som Yesod erbjuder.</p>
                 `
             },
             9: {
                 title: "Malkuth / Nehemoth",
                 content: `
                     <h3>Malkuth (Kungadöme)</h3>
-                    <p>Malkuth representerar den fysiska världen och vår vardagliga verklighet. Det symboliserar manifestation och är den sista emanationen i Livets träd.</p>
+                    <p>Malkuth representerar den fysiska världen och vår vardagliga verklighet, och är den tionde och sista sefiran i Livets träd. Den symboliserar manifestation och är den sista emanationen i Livets träd, där alla de högre energierna och principerna tar form i den materiella världen. Malkuth är den gudomliga egenskapen av fullbordande och konkretisering, en plats där andliga idéer och energier blir till fysisk verklighet. I den kabbalistiska traditionen anses Malkuth vara kungadömet där det gudomliga härskar genom skapelsen, och där varje aspekt av det materiella universum reflekterar den gudomliga viljan. Genom Malkuth uppenbaras den gudomliga viljan att skapa en harmonisk och ordnad värld, där alla delar av skapelsen samverkar i en komplex och sammanhängande helhet. Denna sefira belyser vikten av att leva i balans med den materiella världen och att se skönheten och heligheten i vardagen. Malkuth representerar också förbindelsen mellan himmel och jord, där det fysiska och andliga möts i en enhetlig och integrerad existens.</p>
                     
                     <h3>Nehemoth (De klagande)</h3>
-                    <p>Nehemoth är Malkuths skuggsida och representerar den mörka sidan av den materiella världen. Det symboliserar demonisk besatthet och förtvivlan över den fysiska existensen.</p>
+                    <p>Nehemoth är Malkuths skuggsida och representerar den mörka sidan av den materiella världen. Det är en qlippa inom läran om Qlippoth, som symboliserar demonisk besatthet och förtvivlan över den fysiska existensen. Nehemoth speglar de krafter som leder till en förvrängd och mörk syn på den materiella världen, vilket resulterar i ångest, besatthet och en känsla av meningslöshet istället för harmoni och fullbordande. I Nehemoth finner vi manifestationer av missnöje och klagan, där den fullbordande principen i Malkuth blir till en källa av förtvivlan och negativitet. Denna skuggsida illustrerar hur den fysiska verkligheten kan förvrängas till en plats av plåga och lidande, vilket leder till att den ursprungliga heligheten och harmonin i skapelsen förloras i mörker och förtvivlan. Nehemoth understryker farorna med att fastna i negativitet och missmod, och belyser behovet av att återvinna ljuset och hoppet genom självrannsakan och andlig medvetenhet. Genom att konfrontera och integrera dessa skuggaspekter kan man återvinna den sanna kraften av manifestation och helighet som Malkuth erbjuder.</p>
                 `
             }
         };
@@ -419,7 +540,6 @@
         }
 
         function onHover(event) {
-            // Kontrollera om informationsfönstret är öppet
             if (infoWindow.style.display === 'block') {
                 hoverInfo.style.display = 'none';
                 return;
@@ -441,28 +561,28 @@
                     ctx.beginPath();
                     ctx.moveTo(x1, y1);
                     ctx.lineTo(x2, y2);
-                    ctx.strokeStyle = 'var(--secondary)';
+                    ctx.strokeStyle = 'red';
                     ctx.lineWidth = 3;
                     ctx.stroke();
 
                     const angel = sephiroth[i][2];
                     const demon = qliphoth[i][2];
-                    const text = `Ängel: ${angel}\nDemon: ${demon}`;
+                    const text = `Ängel: ${angel}<br>Demon: ${demon}`;
 
-                    const textX = canvas.width / 2;
-                    const textY = canvas.height / 2;
-
-                    hoverInfo.innerHTML = `<p>${text.replace('\n', '<br>')}</p>`;
+                    hoverInfo.innerHTML = `<p>${text}</p>`;
                     hoverInfo.style.display = 'block';
+                    hoverInfo.classList.add('show');
                     hoverInfo.classList.toggle('dark-mode', isDarkMode);
-
-                    hoverInfo.style.left = `${textX}px`;
-                    hoverInfo.style.top = `${textY}px`;
 
                     lastHighlightedIndex = i;
                     break;
                 } else {
-                    hoverInfo.style.display = 'none';
+                    hoverInfo.classList.remove('show');
+                    setTimeout(() => {
+                        if (!hoverInfo.classList.contains('show')) {
+                            hoverInfo.style.display = 'none';
+                        }
+                    }, 300);
                 }
             }
         }
@@ -488,9 +608,13 @@
         function showInfoWindow(index) {
             const info = treeInfo[index];
             if (info) {
-                infoContent.innerHTML = `<h2>${info.title}</h2>${info.content}`;
+                infoTitle.textContent = info.title;
+                infoContent.innerHTML = info.content;
                 infoWindow.style.display = 'block';
                 infoWindow.classList.toggle('dark-mode', isDarkMode);
+                setTimeout(() => {
+                    infoWindow.classList.add('show');
+                }, 10);
             }
         }
 
@@ -508,7 +632,25 @@
         canvas.addEventListener('click', onClick);
         darkModeToggle.addEventListener('click', toggleDarkMode);
         closeButton.addEventListener('click', () => {
-            infoWindow.style.display = 'none';
+            infoWindow.classList.remove('show');
+            setTimeout(() => {
+                infoWindow.style.display = 'none';
+            }, 500);
+        });
+
+        // Loading animation
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                loadingOverlay.classList.add('fade-out');
+                introText.style.opacity = '1';
+                setTimeout(() => {
+                    introText.style.opacity = '0';
+                    setTimeout(() => {
+                        loadingOverlay.style.display = 'none';
+                        introText.style.display = 'none';
+                    }, 1000);
+                }, 2000);
+            }, 2000);
         });
 
         resizeCanvas();
