@@ -13,12 +13,9 @@
             height: 100%;
             font-family: 'Open Sans', sans-serif;
             color: #f0f0f0;
-            overflow: hidden;
+            overflow-x: hidden;
             background: linear-gradient(135deg, #0a3d62, #3c6382);
             background-attachment: fixed;
-            display: flex;
-            justify-content: center;
-            align-items: center;
         }
 
         body::before {
@@ -48,6 +45,8 @@
             transform: translate(-50%, -50%);
             z-index: 1;
             transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+            overflow-y: auto;
+            max-height: 90vh;
         }
 
         .content-wrapper.hidden {
@@ -297,6 +296,45 @@
             margin-top: 0;
             color: #ffd700;
         }
+
+        @media (max-width: 600px) {
+            .content-wrapper {
+                padding: 15px;
+                width: 95%;
+            }
+
+            h1 {
+                font-size: 2em;
+            }
+
+            h2 {
+                font-size: 1.5em;
+            }
+
+            p {
+                font-size: 0.9em;
+            }
+
+            .btn {
+                display: block;
+                margin: 10px auto;
+                width: 80%;
+            }
+
+            .ocarina-image {
+                width: 96px;
+                height: 82px;
+            }
+
+            .back-button {
+                top: 10px;
+                left: 10px;
+            }
+
+            .arrow-button {
+                display: none;
+            }
+        }
     </style>
 </head>
 <body>
@@ -393,6 +431,7 @@
             element.classList.add('background-element', type);
             
             if (type === 'background-image') {
+                const gridSize = window.innerWidth < 600 ? 50 : 100; // Smaller grid for mobile
                 const gridX = Math.floor(Math.random() * (window.innerWidth / gridSize));
                 const gridY = Math.floor(Math.random() * (window.innerHeight / gridSize));
                 
