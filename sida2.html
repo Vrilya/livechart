@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tidens Okarina - Svensk översättning av Ocarina of Time</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Open+Sans&display=swap');
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            font-family: 'Open Sans', sans-serif;
+            color: #f0f0f0;
+            overflow: hidden;
+            background: linear-gradient(135deg, #0a3d62, #3c6382);
+            background-attachment: fixed;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #0a3d62, #3c6382);
+            background-attachment: fixed;
+            filter: url(#noise);
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        .content-wrapper {
+            max-width: 800px;
+            width: 90%;
+            padding: 30px;
+            background: rgba(10, 61, 98, 0.8);
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1;
+            transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+        }
+
+        .content-wrapper.hidden {
+            opacity: 0;
+            transform: translate(-50%, -50%) scale(0.95);
+            pointer-events: none;
+        }
+
+        h1, h2 {
+            font-family: 'Cinzel', serif;
+            text-align: center;
+            color: #ffd700;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        h1 {
+            font-size: 3em;
+            margin-bottom: 20px;
+        }
+
+        p {
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 12px 24px;
+            background-color: #4CAF50;
+            color: white;
+            text-decoration: none;
+            border-radius: 25px;
+            transition: all 0.3s;
+            font-weight: bold;
+            margin: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            background-color: #45a049;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .ocarina-image {
+            width: 128px;
+            height: 110px;
+            background-image: url('image.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            margin: 30px auto;
+            filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.7));
+            animation: glowPulse 2s infinite alternate;
+        }
+
+        @keyframes glowPulse {
+            from {
+                filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.7));
+            }
+            to {
+                filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.9));
+            }
+        }
+
+        .fairy {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            box-shadow: 0 0 10px 5px rgba(255, 255, 255, 0.8);
+            animation: flyAround 10s infinite ease-in-out, fadeInOut 10s forwards;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .fairy.red {
+            background: #ff5555;
+            box-shadow: 0 0 10px 5px rgba(255, 85, 85, 0.8);
+        }
+
+        .fairy.green {
+            background: #55ff55;
+            box-shadow: 0 0 10px 5px rgba(85, 255, 85, 0.8);
+        }
+
+        .fairy.white {
+            background: #ffffff;
+        }
+
+        @keyframes flyAround {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            25% { transform: translate(50px, -50px) scale(0.8); }
+            50% { transform: translate(100px, 0) scale(1.2); }
+            75% { transform: translate(50px, 50px) scale(0.9); }
+        }
+
+        @keyframes fadeInOut {
+            0%, 100% { opacity: 0; }
+            10%, 90% { opacity: 0.7; }
+        }
+
+        .background-element {
+            position: absolute;
+            pointer-events: none;
+        }
+
+        .background-image {
+            position: absolute;
+            width: 64px;
+            height: 55px;
+            background-image: url('image.png');
+            background-size: cover;
+            opacity: 0;
+            transition: opacity 2s ease-in-out, transform 10s ease-in-out;
+            pointer-events: none;
+        }
+
+        @keyframes rotateSlowly {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .back-button {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            width: 40px;
+            height: 40px;
+            background-color: rgba(255, 215, 0, 0.2);
+            border: 2px solid #ffd700;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 2;
+        }
+
+        .back-button:hover {
+            background-color: rgba(255, 215, 0, 0.4);
+        }
+
+        .back-button::before {
+            content: '';
+            width: 12px;
+            height: 12px;
+            border-left: 3px solid #ffd700;
+            border-bottom: 3px solid #ffd700;
+            transform: rotate(45deg);
+            margin-left: 5px;
+            transition: transform 0.3s ease;
+        }
+
+        .back-button:hover::before {
+            animation: rotateArrow 0.5s forwards;
+        }
+
+        @keyframes rotateArrow {
+            0% { transform: rotate(45deg); }
+            100% { transform: rotate(405deg); }
+        }
+
+        .arrow-button {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 40px;
+            height: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            background: none;
+            border: none;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .arrow-button::before {
+            content: '';
+            width: 20px;
+            height: 20px;
+            border-top: 3px solid #ffd700;
+            border-right: 3px solid #ffd700;
+            transform: rotate(45deg);
+            transition: all 0.3s ease;
+            filter: drop-shadow(0 0 5px rgba(255, 215, 0, 0.5));
+        }
+
+        .arrow-button:hover::before {
+            filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.8));
+            transform: rotate(45deg) scale(1.2);
+        }
+
+        .arrow-button.left {
+            left: 20px;
+        }
+
+        .arrow-button.left::before {
+            transform: rotate(-135deg);
+        }
+
+        .arrow-button.left:hover::before {
+            transform: rotate(-135deg) scale(1.2);
+        }
+
+        .arrow-button.right {
+            right: 20px;
+        }
+
+        .content-wrapper {
+            padding-left: 80px;
+            padding-right: 80px;
+        }
+
+        .download-link {
+            display: block;
+            margin: 15px 0;
+            padding: 10px 20px;
+            background-color: #ffd700;
+            color: #0a3d62;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .download-link:hover {
+            background-color: #ffec8b;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .md5-info {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            padding: 15px;
+            margin-top: 20px;
+            font-size: 0.9em;
+        }
+
+        .md5-info h3 {
+            margin-top: 0;
+            color: #ffd700;
+        }
+    </style>
+</head>
+<body>
+    <!-- SVG filter for noise -->
+    <svg xmlns="http://www.w3.org/2000/svg" version="1.1" style="display: none;">
+        <defs>
+            <filter id="noise">
+                <feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch"/>
+                <feComposite operator="in" in2="SourceGraphic" result="monoNoise"/>
+                <feBlend in="SourceGraphic" in2="monoNoise" mode="screen"/>
+            </filter>
+        </defs>
+    </svg>
+
+    <div class="content-wrapper" id="welcome-content">
+        <h1>Tidens Okarina</h1>
+        <div class="ocarina-image"></div>
+        <h2>En svensk översättning av Ocarina of Time</h2>
+        <p>Välkommen till "Tidens Okarina", en svensk översättning av spelet "The Legend of Zelda: Ocarina of Time". Översatt av Peter Vrilya Brink, detta projekt syftar till att bringa Hyrules magiska värld närmare svenska spelare.</p>
+        <p>Upplev äventyret, utforska de mystiska skogarna och rädda kungariket på ditt modersmål. Låt musiken från okarinen vägleda dig genom tid och rum i denna episka saga.</p>
+        <div style="text-align: center;">
+            <a href="#" class="btn" onclick="showDownloadContent()">Ladda ner översättningen</a>
+            <a href="https://github.com/vrilya" class="btn">Besök GitHub</a>
+            <button class="btn" onclick="showProjectInfo()">Om projektet</button>
+        </div>
+    </div>
+
+    <div class="content-wrapper hidden" id="project-info">
+        <div class="back-button" onclick="showWelcomeContent()"></div>
+        <h1>Om projektet</h1>
+        <p>Detta projekt är resultatet av en djupgående studie och utveckling av anpassade verktyg för att översätta "The Legend of Zelda: Ocarina of Time" till svenska.</p>
+        <p>För att genomföra detta har jag använt följande verktyg:</p>
+        <ul>
+            <li>Notepad++ och Python - Utveckling av alla verktyg för att hantera text och bitmap.</li>
+            <li>Gimp - Redigering av extraherade bilder.</li>
+            <li>Ghidra - Analys och dokumentering av PAL-romen.</li>
+            <li>HxD - Analys av PAL-romen i dess råa form.</li>
+            <li>Project64 - Debugga och testa ändringar i realtid.</li>
+            <li>Jag har även använt Zeldarets dekompilering av Master Quest för att förstå spelets struktur.</li>
+        </ul>
+        <p>Översättningen ligger närmare den japanska originaltexten. Detta beror på att en del av spelets humor och vissa nyanser har ändrats markant i den engelska versionen. Genom att utgå från den japanska texten försöker jag bevara spelets ursprungliga känsla och betydelse.</p>
+        <div class="arrow-button right" onclick="showProjectStart()"></div>
+    </div>
+
+    <div class="content-wrapper hidden" id="project-start">
+        <div class="back-button" onclick="showWelcomeContent()"></div>
+        <div class="arrow-button left" onclick="showProjectInfo()"></div>
+        <h1>Projektets början</h1>
+        <p>Detta projekt inleddes 2022 på Discord-servern för Open Ocarina of Time (OOOT), ett initiativ för att porta Ocarina of Time till PC från Zeldarets dekompilering av Ocarina of Time Master Quest.</p>
+        <p>Projektledaren frågade om det fanns intresse för att skriva översättningar till hans portning, och jag tillsammans med en annan medlem kallad Tatsker, tog på oss uppgiften. Tyvärr blev det inte mycket av det, då projektledaren avbröt portningen innan stöd för andra tecken än de som redan fanns i spelet hann implementeras.</p>
+        <p>Vid ett senare tillfälle bestämde jag mig för att inte överge idén om en svensk översättning av Ocarina of Time, så jag tog på mig uppgiften att skapa en översättning som skulle fungera direkt med ROM-filen, så att den kunde spelas på en riktig N64.</p>
+        <p>Detta innebar att textformateringen i spelet blev extra viktig, och jag ville att det skulle se så snyggt ut som möjligt. För att uppnå detta behövde jag ha full kontroll över översättningen, vilket innebar att jag fick börja om från början.</p>
+    </div>
+
+    <div class="content-wrapper hidden" id="download-content">
+        <div class="back-button" onclick="showWelcomeContent()"></div>
+        <h1>Ladda ner översättningen</h1>
+        <p>Välj rätt patch beroende på vilken version av spelet du har:</p>
+        
+        <a href="#" class="download-link">Ladda ner patch för PAL-versionen</a>
+        <a href="#" class="download-link">Ladda ner patch för NTSC-versionen</a>
+        
+        <div class="md5-info">
+            <h3>Viktigt att notera:</h3>
+            <p>För att säkerställa att patchen fungerar korrekt, kontrollera att din ROM-fil har rätt MD5-checksumma:</p>
+            <ul>
+                <li>PAL-versionen: <strong>E040DE91A74B61E3201DB0E2323F768A</strong></li>
+                <li>NTSC-versionen: <strong>5BD1FE107BF8106B2AB6650ABECD54D6</strong></li>
+            </ul>
+            <p>Om din ROM inte matchar dessa checksummor, kan det hända att patchen inte fungerar som den ska.</p>
+        </div>
+    </div>
+
+    <script>
+        const backgroundImages = [];
+        const gridSize = 100; // Size of each grid cell
+
+        function createFairy() {
+            const fairy = document.createElement('div');
+            const colors = ['red', 'green', 'white'];
+            const randomColor = colors[Math.floor(Math.random() * colors.length)];
+            fairy.classList.add('fairy', randomColor);
+            fairy.style.left = Math.random() * (window.innerWidth - 20) + 10 + 'px';
+            fairy.style.top = Math.random() * (window.innerHeight - 20) + 10 + 'px';
+            document.body.appendChild(fairy);
+
+            setTimeout(() => {
+                fairy.remove();
+            }, 10000);
+        }
+
+        function createBackgroundElement(type) {
+            const element = document.createElement('div');
+            element.classList.add('background-element', type);
+            
+            if (type === 'background-image') {
+                const gridX = Math.floor(Math.random() * (window.innerWidth / gridSize));
+                const gridY = Math.floor(Math.random() * (window.innerHeight / gridSize));
+                
+                element.style.left = (gridX * gridSize + Math.random() * 20 - 10) + 'px';
+                element.style.top = (gridY * gridSize + Math.random() * 20 - 10) + 'px';
+                
+                element.style.animationName = 'rotateSlowly';
+                element.style.animationDuration = (Math.random() * 20 + 10) + 's';
+                element.style.animationTimingFunction = 'linear';
+                element.style.animationIterationCount = 'infinite';
+                
+                setTimeout(() => {
+                    element.style.opacity = (Math.random() * 0.3 + 0.1).toString();
+                }, 100);
+
+                backgroundImages.push(element);
+            } else {
+                element.style.left = Math.random() * (window.innerWidth - 60) + 30 + 'px';
+                element.style.top = Math.random() * (window.innerHeight - 100) + 50 + 'px';
+            }
+            
+            document.body.appendChild(element);
+
+            if (type === 'background-image') {
+                fadeOutAndRemove(element);
+            }
+        }
+
+        function fadeOutAndRemove(element) {
+            setTimeout(() => {
+                element.style.opacity = '0';
+                setTimeout(() => {
+                    element.remove();
+                    backgroundImages.splice(backgroundImages.indexOf(element), 1);
+                    createBackgroundElement('background-image');
+                }, 2000);
+            }, Math.random() * 10000 + 5000);
+        }
+
+        function showProjectInfo() {
+            hideAllContent();
+            setTimeout(() => {
+                document.getElementById('project-info').style.display = 'block';
+                setTimeout(() => {
+                    document.getElementById('project-info').classList.remove('hidden');
+                }, 50);
+            }, 500);
+        }
+
+        function showProjectStart() {
+            hideAllContent();
+            setTimeout(() => {
+                document.getElementById('project-start').style.display = 'block';
+                setTimeout(() => {
+                    document.getElementById('project-start').classList.remove('hidden');
+                }, 50);
+            }, 500);
+        }
+
+        function showWelcomeContent() {
+            hideAllContent();
+            setTimeout(() => {
+                document.getElementById('welcome-content').style.display = 'block';
+                setTimeout(() => {
+                    document.getElementById('welcome-content').classList.remove('hidden');
+                }, 50);
+            }, 500);
+        }
+
+        function showDownloadContent() {
+            hideAllContent();
+            setTimeout(() => {
+                document.getElementById('download-content').style.display = 'block';
+                setTimeout(() => {
+                    document.getElementById('download-content').classList.remove('hidden');
+                }, 50);
+            }, 500);
+        }
+
+        function hideAllContent() {
+            const contents = ['welcome-content', 'project-info', 'project-start', 'download-content'];
+            contents.forEach(id => {
+                const element = document.getElementById(id);
+                element.classList.add('hidden');
+                setTimeout(() => {
+                    element.style.display = 'none';
+                }, 500);
+            });
+        }
+
+        // Create initial background elements
+        for (let i = 0; i < 30; i++) {
+            createBackgroundElement('background-image');
+        }
+
+        setInterval(createFairy, 1000);
+        setInterval(() => {
+            if (backgroundImages.length < 30) {
+                createBackgroundElement('background-image');
+            }
+        }, 2000);
+    </script>
+</body>
+</html>
