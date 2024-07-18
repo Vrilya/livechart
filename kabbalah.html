@@ -82,8 +82,8 @@
             font-family: 'Montserrat', sans-serif;
             transition: all 0.5s ease;
             opacity: 0;
-            padding: 20px; /* Lägg till padding */
-            box-sizing: border-box; /* Säkerställ box-sizing */
+            padding: 20px;
+            box-sizing: border-box;
         }
 
         #infoWindow.show {
@@ -132,7 +132,7 @@
             overflow-y: auto;
             scrollbar-width: thin;
             scrollbar-color: var(--primary) var(--light-bg);
-            box-sizing: border-box; /* Säkerställ box-sizing */
+            box-sizing: border-box;
         }
 
         #infoWindow.dark-mode #infoContent {
@@ -307,7 +307,8 @@
             ["Netzach", "#00FF00", "Haniel"],
             ["Hod", "#FFA500", "Michael"],
             ["Yesod", "#800080", "Gabriel"],
-            ["Malkuth", "#8B4513", "Sandalphon"]
+            ["Malkuth", "#8B4513", "Sandalphon"],
+            ["Da'ath", "#CCCCCC", ""] // Added Da'ath
         ];
 
         const qliphoth = [
@@ -328,6 +329,11 @@
             [3, 4], [3, 5], [3, 6], [4, 5], [4, 7], [5, 6], [5, 7],
             [5, 8], [6, 7], [6, 8], [7, 8], [8, 9], [6, 9], [7, 9],
             [0, 5]
+        ];
+
+        // New connections for Da'ath
+        const daathConnections = [
+            [10, 0], [10, 1], [10, 2], [10, 3], [10, 4], [10, 5]
         ];
 
         let lifeCenters = [];
@@ -434,6 +440,17 @@
                     <h3>Nehemoth (De klagande)</h3>
                     <p>Nehemoth är Malkuths skuggsida och representerar den mörka sidan av den materiella världen. Det är en qlippa inom läran om Qlippoth, som symboliserar demonisk besatthet och förtvivlan över den fysiska existensen. Nehemoth speglar de krafter som leder till en förvrängd och mörk syn på den materiella världen, vilket resulterar i ångest, besatthet och en känsla av meningslöshet istället för harmoni och fullbordande. I Nehemoth finner vi manifestationer av missnöje och klagan, där den fullbordande principen i Malkuth blir till en källa av förtvivlan och negativitet. Denna skuggsida illustrerar hur den fysiska verkligheten kan förvrängas till en plats av plåga och lidande, vilket leder till att den ursprungliga heligheten och harmonin i skapelsen förloras i mörker och förtvivlan. Nehemoth understryker farorna med att fastna i negativitet och missmod, och belyser behovet av att återvinna ljuset och hoppet genom självrannsakan och andlig medvetenhet. Genom att konfrontera och integrera dessa skuggaspekter kan man återvinna den sanna kraften av manifestation och helighet som Malkuth erbjuder.</p>
                 `
+            },
+            10: {
+                title: "Da'ath",
+                content: `
+                    <h3>Da'ath (Kunskap)</h3>
+                    <p>Da'ath, som betyder "Kunskap" på hebreiska, är en unik och mystisk punkt i det kabbalistiska Livets träd. Till skillnad från de andra tio sefiroterna är Da'ath inte en fullständig sefira, utan snarare en "pseudo-sefira" eller en "osynlig sefira". Den placeras ofta i centrum av Livets träd, mellan Keter och Tiferet, och fungerar som en bro mellan de övre och nedre sefiroterna.</p>
+                    <p>Da'ath representerar den medvetna förbindelsen mellan det mänskliga och det gudomliga. Det symboliserar den djupa, esoteriska kunskapen som går bortom ytlig förståelse och intellektuell kunskap. I kabbalistisk tradition anses Da'ath vara platsen där den individuella medvetenheten kan förenas med den gudomliga medvetenheten.</p>
+                    <p>Som en osynlig sefira representerar Da'ath också ett slags "avgrund" eller en tröskel som måste korsas i den andliga utvecklingen. Det är en punkt av transformation där den sökande måste överge sina förutfattade meningar och begränsade förståelse för att nå högre nivåer av medvetenhet.</p>
+                    <p>Da'ath har ingen direkt motsvarighet i Qliphoth (de mörka skuggsidorna av sefiroterna), vilket understryker dess unika och transcendenta natur. Det är en påminnelse om att den högsta formen av kunskap inte har någon skugga eller motsats, utan är ren och absolut i sin natur.</p>
+                    <p>I praktisk kabbala och meditation används Da'ath ofta som en portal för att nå högre medvetandetillstånd och för att integrera de högre andliga insikterna i det dagliga livet. Det representerar förmågan att förstå och tillämpa den gudomliga visdomen i den materiella världen.</p>
+                `
             }
         };
 
@@ -454,7 +471,8 @@
                 [25, inverted ? 40 : 60],
                 [75, inverted ? 40 : 60],
                 [50, inverted ? 20 : 80],
-                [50, inverted ? 5 : 95]
+                [50, inverted ? 5 : 95],
+                [50, 30] // Da'ath position
             ];
 
             ctx.strokeStyle = isDarkMode ? 'rgba(255, 255, 255, 0.6)' : 'rgba(0, 0, 0, 0.6)';
@@ -468,6 +486,21 @@
                 ctx.stroke();
             }
 
+            // Draw Da'ath connections
+            if (!inverted) {
+                ctx.setLineDash([5, 5]); // Set to dashed line
+                ctx.strokeStyle = isDarkMode ? 'rgba(255, 255, 255, 0.4)' : 'rgba(0, 0, 0, 0.4)';
+                for (let [start, end] of daathConnections) {
+                    let [x1, y1] = positions[start];
+                    let [x2, y2] = positions[end];
+                    ctx.beginPath();
+                    ctx.moveTo(startX + x1 * scaleX, startY + y1 * scaleY);
+                    ctx.lineTo(startX + x2 * scaleX, startY + y2 * scaleY);
+                    ctx.stroke();
+                }
+                ctx.setLineDash([]); // Reset to solid line
+            }
+
             const nodeCenters = [];
             for (let i = 0; i < nodes.length; i++) {
                 const [name, color, _] = nodes[i];
@@ -476,28 +509,30 @@
                 const centerX = startX + x * scaleX;
                 const centerY = startY + y * scaleY;
 
-                ctx.beginPath();
-                ctx.arc(centerX, centerY, radius + 3, 0, 2 * Math.PI);
-                ctx.fillStyle = isDarkMode ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.2)';
-                ctx.fill();
+                if (i !== 10 || !inverted) { // Don't draw Da'ath for the inverted tree
+                    ctx.beginPath();
+                    ctx.arc(centerX, centerY, radius + 3, 0, 2 * Math.PI);
+                    ctx.fillStyle = isDarkMode ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.2)';
+                    ctx.fill();
 
-                ctx.beginPath();
-                ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
-                ctx.fillStyle = color;
-                ctx.fill();
+                    ctx.beginPath();
+                    ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
+                    ctx.fillStyle = color;
+                    ctx.fill();
 
-                ctx.font = `bold ${radius / 1.2}px Montserrat`;
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
+                    ctx.font = `bold ${radius / 1.2}px Montserrat`;
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
 
-                ctx.strokeStyle = 'rgba(0, 0, 0, 0.8)';
-                ctx.lineWidth = 4;
-                ctx.strokeText(name, centerX, centerY);
+                    ctx.strokeStyle = 'rgba(0, 0, 0, 0.8)';
+                    ctx.lineWidth = 4;
+                    ctx.strokeText(name, centerX, centerY);
 
-                ctx.fillStyle = 'white';
-                ctx.fillText(name, centerX, centerY);
+                    ctx.fillStyle = 'white';
+                    ctx.fillText(name, centerX, centerY);
 
-                nodeCenters.push([centerX, centerY]);
+                    nodeCenters.push([centerX, centerY]);
+                }
             }
 
             return nodeCenters;
@@ -553,20 +588,22 @@
             const radius = Math.min(canvas.width, canvas.height) / 30;
             for (let i = 0; i < lifeCenters.length; i++) {
                 const [x1, y1] = lifeCenters[i];
-                const [x2, y2] = deathCenters[i];
+                const [x2, y2] = i < deathCenters.length ? deathCenters[i] : [null, null];
 
                 if ((Math.abs(x - x1) <= radius && Math.abs(y - y1) <= radius) ||
-                    (Math.abs(x - x2) <= radius && Math.abs(y - y2) <= radius)) {
+                    (x2 !== null && Math.abs(x - x2) <= radius && Math.abs(y - y2) <= radius)) {
                     
-                    ctx.beginPath();
-                    ctx.moveTo(x1, y1);
-                    ctx.lineTo(x2, y2);
-                    ctx.strokeStyle = 'red';
-                    ctx.lineWidth = 3;
-                    ctx.stroke();
+                    if (i < deathCenters.length) {
+                        ctx.beginPath();
+                        ctx.moveTo(x1, y1);
+                        ctx.lineTo(x2, y2);
+                        ctx.strokeStyle = 'red';
+                        ctx.lineWidth = 3;
+                        ctx.stroke();
+                    }
 
                     const angel = sephiroth[i][2];
-                    const demon = qliphoth[i][2];
+                    const demon = i < qliphoth.length ? qliphoth[i][2] : "N/A";
                     const text = `Ängel: ${angel}<br>Demon: ${demon}`;
 
                     hoverInfo.innerHTML = `<p>${text}</p>`;
@@ -595,10 +632,10 @@
             const radius = Math.min(canvas.width, canvas.height) / 30;
             for (let i = 0; i < lifeCenters.length; i++) {
                 const [x1, y1] = lifeCenters[i];
-                const [x2, y2] = deathCenters[i];
+                const [x2, y2] = i < deathCenters.length ? deathCenters[i] : [null, null];
 
                 if ((Math.abs(x - x1) <= radius && Math.abs(y - y1) <= radius) ||
-                    (Math.abs(x - x2) <= radius && Math.abs(y - y2) <= radius)) {
+                    (x2 !== null && Math.abs(x - x2) <= radius && Math.abs(y - y2) <= radius)) {
                     showInfoWindow(i);
                     break;
                 }
